@@ -1,0 +1,228 @@
+Changes between 0.0.11 and 0.1.0-git:
+----------------------------------
+
+
+Changes between 0.0.10 and 0.0.11:
+----------------------------------
+Main Application:
+ * Numerous fixes for recurrent crashes
+ * Better debugging log facility
+ * Show seek position when locked in fullscreen mode
+ * Avoid running thumbnailer when playing audio only
+ * Improve the overlay fading after a gesture
+
+Translations:
+ * Initial Burmese, Danish, and Serbian translations
+ * Updates to the Bosnian, Catalan, Croatian, Czech, Danish, Dutch,
+   Estonian, German, Italian, Japanese, Khmer, Norwegian Bokmål, Polish,
+   Portuguese, Russian, Slovak, Spanish, Thai, Turkish, Ukrainian, Urdu,
+   Simplified Chinese, and Traditional Chinese translations
+
+
+Changes between 0.0.9 and 0.0.10:
+---------------------------------
+ * Subs selection
+ * Fixes for 2 frequent crashes
+
+
+Changes between 0.0.8 and 0.0.9:
+--------------------------------
+Core:
+ * Various crash/stability fixes
+ * Improved video-audio synchronization
+ * Improved automatic SD card detection
+ * Experimental YV12-based androidsurface
+ * Wakelock issue with stopping was fixed
+ * Use of a faster DTS decoding library
+ * Codec updates
+
+Main application:
+ * SD cards mount point fixes
+ * Change of subtitle encoding is now possible
+ * Subtitles and audio track selection is now preserved across calls
+ * Many bugfixes in the interface
+ * Fix selection of some audio tracks
+ * A sleep timer was added for audio and video
+ * Added an option to add custom paths to the media library scanner
+ * content:// based URIs from Camera and file pickers now supported
+ * Fix video player resume of media outside the media library
+ * Jump to Time feature
+ * Allow to open a video as audio-only
+
+Widget:
+ * Display the timeline
+
+Translations:
+ * Initial Traditional Chinese, Catalan, and Urdu, Odia,
+   Norwegian Bokmål and Portuguese (Portugal) translations
+ * Updates to the Bosnian, Japanese, Russian, French, Korean,
+   Simplified Chinese, Turkish, Thai, Slovak, Polish, Dutch, Khmer,
+   Italian, Hebrew, Galician, Spanish, German, Czech, Estonian,
+   Hindi, and Bosnian translations
+
+
+Changes between 0.0.7 and 0.0.8:
+--------------------------------
+
+Core:
+ * Support MIPS compilation
+
+Main application:
+ * SD cards mount points are auto-detected
+ * Directory view starts from the SD cards and are live-detected
+ * Improve the thumbnailing process
+ * Improve the headset handling and remote control code, including bluetooth
+ * Correctly support the lock screen controls
+ * Fixes for Android 4.2 support
+ * Fix for sound notification loudness
+ * Fixes miscellaneous crashes and issues
+
+Interface:
+ * Allow toggling between remaining and total time in fullscreen
+ * Allow a menu option to start the media from the beginning
+ * Add different options for rotation and screen orientation
+ * Fix sorting of album tracks
+ * Add a ticker in the status bar, when playing audio
+ * Improve the Directories View
+ * Translations
+
+
+Changes between 0.0.6 and 0.0.7:
+--------------------------------
+
+Core:
+ * Fix audio output selection to fix the audio-sync
+
+Main application:
+ * reduce the memory used for thumbnails decoding
+ * better behaviour when we are low on memory
+ * fix the interaction between thumbnailing and sleeping
+ * fix various crashes
+
+Interface:
+ * better multi-column look on low resolution phones
+ * fix audio song sorting
+ * add a popup-menu in the video list
+ * Show Volume and Brightness values
+ * fix navbar hiding on tablets
+
+
+Changes between 0.0.5 and 0.0.6:
+--------------------------------
+
+Core:
+ * Change threading code for Android
+ * Fix MediaCodec decoding
+ * Fix audio issues in cook and DTS
+
+Main application:
+ * Reduce the memory and CPU used in the video list
+ * Use bitmap caching to improve smoothness
+ * Display the current playing position as a progress bar under every video
+
+Interface:
+ * Add animations in the video list
+ * Simplify the fullscreen interface
+
+
+Changes between 0.0.4 and 0.0.5:
+--------------------------------
+
+Core:
+ * Autodetection of NEON at runtime: ARMv7-a builds should work everywhere
+   including tegra2 and cortex-a8 without NEON
+ * Better threading support
+ * Support for MediaCodec Jelly Bean hardware decoding
+
+Main application
+ * Better extensions and intent integration
+ * Better service start/stop to avoid using CPU when VLC is not running or
+   when we are playing a video
+ * Automatic rescan when needed
+ * Fix headset detection during phone calls
+ * Fix several crashes
+ * Fix compatibility with Android 2.1 (android-7)
+
+Interface:
+ * New grid look for Video List on tablets and phone in landscape-mode
+ * Cover arts are now shown in Audio List panels
+ * Better notification and use of covers in notifications
+ * Directory View back button does now a parent-up action
+ * Fix several crashes and misbehaviour of fragments
+ * Fix small issues in About dialog, Video List, menu and preferences
+ * Back button correctly behaves in fullscreen
+ * Fix several sliding menu bugs
+
+Translations
+ * many :)
+
+
+Changes between 0.0.3 and 0.0.4:
+--------------------------------
+
+Interface:
+ * Many Sliding Menu fixes
+ * Fix subtitles and audio tracks selection
+ * Fix Sliding menu selection
+ * Fix about dialog
+ * Update the android compatibility library to avoid crashes (r10)
+ * Miscellaneous fixes
+
+Core:
+ * fix mp4 playback
+ * correctly restrain the background processing of thumbnails and medialibrary
+
+
+Changes between 0.0.2 and 0.0.3:
+--------------------------------
+
+Device specific:
+ * Add support for the Nexus7
+ * Add support for Android x86
+
+Core:
+ * Many, many bugfixes and stability improvements
+ * Building for Android-x86 is now supported
+ * IOMX hardware acceleration and AudioTrack improvements on Jellybean
+ * Media library scanning is now faster and more efficient
+ * The aspect ratio is now correctly handled in software decoding
+
+Interface:
+ * Sliding panel added in video player
+ * Tabs replaced with a sliding sidebar
+ * Added the feature to change the playback speed in audio and video
+ * Improved seek gesture
+ * Added optional brightness gesture
+ * Added ability to set the system ringtone to a song from VLC
+ * Added history support
+ * On ICS and above, added lockscreen control for music
+
+Translations:
+ * Added Arabic, Bengali, Bosnian, Korean, Russian, Thai translations
+ * Updates for the Simplified Chinese, Turkish, Polish, Hebrew,
+   Galician, German, Czech, Bosnian, Estonian, Japanese, Italian, Dutch,
+   Hindi and Slovak translations
+
+Changes between 0.0.1 and 0.0.2:
+--------------------------------
+
+Core:
+ * the application can now go on the SDcard
+ * Database speed improvements
+ * .nomedia folders are correctly ignored now
+
+Interface:
+ * Dynamically switch from audio to video player on ES change
+ * Reduce video player control size
+ * ICS: better integration when dimming and fullscreen
+ * Deletion is possible in folder mode
+
+Stability issues:
+ * Fix numerous crashes
+ * Fix some memory leaks
+ * Better separation of the audio widget and the service
+
+Translations:
+ * Added Hebrew, Polish, Hindi, Basque, Galician, Dutch, Ukrainian, Croatian,
+   Czech, Scottish Gaelic, Telugu, Japanese, Chinese Simplified, Slovak,
+   Spanish, Walloon, Marathi, Khmer, Italian, Polish and Estonian translations

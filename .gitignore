@@ -1,0 +1,9 @@
+/vlc/
+/android-libs/*.so
+local.properties
+.DS_Store
+*.keystore
+*~
+.*.swp
+.directory
+env.sh
