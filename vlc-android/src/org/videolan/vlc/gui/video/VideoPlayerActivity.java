@@ -273,6 +273,7 @@ public class VideoPlayerActivity extends Activity {
         }
         mSurfaceAlign = 16 / pitch - 1;
         mSurfaceHolder.addCallback(mSurfaceCallback);
+        mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
         mSeekbar = (SeekBar) findViewById(R.id.player_overlay_seekbar);
         mSeekbar.setOnSeekBarChangeListener(mSeekListener);
@@ -398,11 +399,7 @@ public class VideoPlayerActivity extends Activity {
         mAudioManager = null;
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        AudioServiceController.getInstance().bindAudioService(this);
-
+    private void doLoading() {
         load();
 
         /*
@@ -422,6 +419,12 @@ public class VideoPlayerActivity extends Activity {
             }}, 500);
 
         showOverlay();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AudioServiceController.getInstance().bindAudioService(this);
     }
 
     public static void start(Context context, String location) {
@@ -1194,6 +1197,7 @@ public class VideoPlayerActivity extends Activity {
 
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
+            doLoading();
         }
 
         @Override

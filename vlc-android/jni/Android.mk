@@ -102,3 +102,13 @@ LOCAL_CFLAGS     := -Wno-psabi
 LOCAL_LDLIBS     := -L$(ANDROID_LIBS) -lgcc -lstagefright -lmedia -lutils -lbinder
 
 include $(BUILD_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE     := libsurfacehelper
+LOCAL_SRC_FILES  := ../$(VLC_SRC_DIR)/modules/video_output/SurfaceHelper.cpp
+LOCAL_C_INCLUDES := $(VLC_SRC_DIR)/modules/video_output $(ANDROID_SYS_HEADERS_GINGERBREAD)/frameworks/base/include $(ANDROID_SYS_HEADERS_GINGERBREAD)/system/core/include $(ANDROID_SYS_HEADERS_GINGERBREAD)/hardware/libhardware/include
+LOCAL_CFLAGS     := -Wall -D___ANDROID___ -DOMAP_ENHANCEMENT -DPARROT_MEDIA_OUT -Os
+LOCAL_LDLIBS     := -L$(ANDROID_LIBS) -lgcc -lutils -lcutils -lui -lsurfaceflinger_client
+
+include $(BUILD_SHARED_LIBRARY)

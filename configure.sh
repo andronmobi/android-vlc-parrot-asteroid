@@ -50,7 +50,8 @@ sh $VLC_SOURCEDIR/configure --host=$TARGET_TUPLE --build=x86_64-unknown-linux $E
                 --enable-avcodec \
                 --enable-opus \
                 --enable-opensles \
-                --enable-android-surface \
+                --disable-android-surface \
+                --enable-android-ti-overlay \
                 --enable-mkv \
                 --enable-taglib \
                 --enable-dvbpsi \

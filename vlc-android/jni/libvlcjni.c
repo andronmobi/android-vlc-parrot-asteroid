@@ -509,7 +509,7 @@ void Java_org_videolan_vlc_LibVLC_nativeInit(JNIEnv *env, jobject thiz, jboolean
         "--subsdec-encoding", subsencodingstr,
         enable_time_stretch ? "--audio-time-stretch" : "--no-audio-time-stretch",
         use_opensles ? "--aout=opensles" : "--aout=android_audiotrack",
-        "--androidsurface-chroma", chromastr != NULL && chromastr[0] != 0 ? chromastr : "RV32",
+        "--androidtioverlay-chroma", chromastr != NULL && chromastr[0] != 0 ? chromastr : "RV32",
     };
     libvlc_instance_t *instance = libvlc_new(sizeof(argv) / sizeof(*argv), argv);
 

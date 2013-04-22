@@ -51,6 +51,9 @@ protected:
 #ifdef OMAP_ENHANCEMENT
         CREATE_OVERLAY_S3D,
         SET_DISPLAY_ID,
+#ifdef PARROT_MEDIA_OUT
+        GET_DISPLAY_ID,
+#endif // PARROT_MEDIA_OUT
         REQUEST_OVERLAY_CLONE
 #endif
     };
@@ -115,9 +118,15 @@ public:
     virtual sp<OverlayRef> createOverlay(
             uint32_t w, uint32_t h, int32_t format, int32_t orientation) = 0;
 #ifdef OMAP_ENHANCEMENT
-    virtual sp<OverlayRef> createOverlay(
-            uint32_t w, uint32_t h, int32_t format, int32_t orientation, int isS3D) = 0;
     virtual void setDisplayId(int displayId) = 0;
+#ifdef PARROT_MEDIA_OUT
+    virtual sp<OverlayRef> createOverlay(
+                uint32_t w, uint32_t h, int32_t format, int32_t orientation, int isS3D, int voutStd) = 0;
+    virtual int getDisplayId() = 0;
+#else
+    virtual sp<OverlayRef> createOverlay(
+                uint32_t w, uint32_t h, int32_t format, int32_t orientation, int isS3D) = 0;
+#endif // PARROT_MEDIA_OUT
     virtual int  requestOverlayClone(bool enable) = 0;
 #endif
 
