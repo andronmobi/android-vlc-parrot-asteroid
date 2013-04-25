@@ -304,6 +304,20 @@ public class LibVLC {
     }
 
     /**
+     * Get a screen id of display where video is playing.
+     * Surface should be attached before calling the method, otherwise -1 will
+     * be returned.
+     */
+    public native int getScreenId();
+
+    /**
+     * Set a screen id where video will be playing.
+     * Surface should be attached before calling the method, otherwise screen wont
+     * be changed.
+     */
+    public native void setScreenId(int screenId);
+
+    /**
      * Sets the speed of playback (1 being normal speed, 2 being twice as fast)
      *
      * @param rate

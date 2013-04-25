@@ -24,4 +24,10 @@
         android:layout_height="40dip"
         android:background="@drawable/ic_forward" />
 
+    <ImageButton
+        android:id="@+id/player_overlay_screen"
+        android:layout_width="40dip"
+        android:layout_height="40dip"
+        android:background="@drawable/ic_screen_normal" />
+
 </LinearLayout>

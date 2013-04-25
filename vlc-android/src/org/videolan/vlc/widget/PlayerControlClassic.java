@@ -36,6 +36,7 @@ public class PlayerControlClassic extends LinearLayout implements IPlayerControl
     private ImageButton mBackward;
     private ImageButton mPlayPause;
     private ImageButton mForward;
+    private ImageButton mScreen;
     private OnPlayerControlListener listener = null;
 
     public PlayerControlClassic(Context context) {
@@ -49,6 +50,8 @@ public class PlayerControlClassic extends LinearLayout implements IPlayerControl
         mPlayPause.setOnClickListener(mPlayPauseListener);
         mForward = (ImageButton) findViewById(R.id.player_overlay_forward);
         mForward.setOnClickListener(mForwardListener);
+        mScreen = (ImageButton) findViewById(R.id.player_overlay_screen);
+        mScreen.setOnClickListener(mScreenListener);
     }
 
     private OnClickListener mBackwardListener = new OnClickListener() {
@@ -70,6 +73,13 @@ public class PlayerControlClassic extends LinearLayout implements IPlayerControl
         public void onClick(View v) {
             if (listener != null)
                 listener.onSeek(10000);
+        }
+    };
+    private OnClickListener mScreenListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (listener != null)
+                listener.onScreen();
         }
     };
 

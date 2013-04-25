@@ -143,6 +143,7 @@ public class VideoPlayerActivity extends Activity {
     private boolean mIsLocked = false;
     private int mLastAudioTrack = -1;
     private int mLastSpuTrack = -2;
+    private int mScreenId = -1;
 
     /**
      * For uninterrupted switching between audio and video mode
@@ -695,6 +696,12 @@ public class VideoPlayerActivity extends Activity {
     }
 
     private void handleVout(Message msg) {
+        if (msg.getData().getInt("data") == 1 && !mEndReached) {
+            mScreenId = mLibVLC.getScreenId();
+            if (mScreenId == -1)
+                Log.e(TAG, "Can't detect screen id");
+            //set appropriate icon for the button changing a screen.
+        }
         if (msg.getData().getInt("data") == 0 && !mEndReached) {
             /* Video track lost, open in audio mode */
             Log.i(TAG, "Video track lost, switching to audio");
@@ -1068,6 +1075,7 @@ public class VideoPlayerActivity extends Activity {
     *
     */
     private final OnPlayerControlListener mPlayerControlListener = new OnPlayerControlListener() {
+
         @Override
         public void onPlayPause() {
             if (mLibVLC.isPlaying())
@@ -1110,6 +1118,16 @@ public class VideoPlayerActivity extends Activity {
                 hideInfo();
                 showOverlay();
             }
+        }
+
+        @Override
+        public void onScreen() {
+            if (mScreenId == -1) {
+                Log.w(TAG, "Can't change screen id");
+                return;
+            }
+            mScreenId = (mScreenId == 0) ? 2 : 0;
+            mLibVLC.setScreenId(mScreenId);
         }
     };
 

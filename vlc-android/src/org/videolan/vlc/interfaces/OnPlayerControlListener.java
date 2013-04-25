@@ -30,4 +30,6 @@ public interface OnPlayerControlListener {
     public abstract void onSeekTo(long position);
 
     public abstract void onShowInfo(String info);
+
+    public abstract void onScreen();
 }

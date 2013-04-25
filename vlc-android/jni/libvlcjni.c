@@ -335,6 +335,33 @@ void JNI_OnUnload(JavaVM* vm, void* reserved) {
     pthread_mutex_destroy(&vout_android_lock);
 }
 
+jint Java_org_videolan_vlc_LibVLC_getScreenId(JNIEnv *env, jobject thiz) {
+    jint id = -1;
+    pthread_mutex_lock(&vout_android_lock);
+    if (vout_android_surf) {
+        libvlc_media_player_t* mp = getMediaPlayer(env, thiz);
+        if (mp) {
+            if (libvlc_media_player_has_vout(mp)) {
+                id = 0; // TODO id = libvlc_get_screen_id(mp);
+            }
+        }
+    }
+    pthread_mutex_unlock(&vout_android_lock);
+    return id;
+}
+
+void Java_org_videolan_vlc_LibVLC_setScreenId(JNIEnv *env, jobject thiz, jint screenId) {
+    pthread_mutex_lock(&vout_android_lock);
+    if (vout_android_surf) {
+        libvlc_media_player_t* mp = getMediaPlayer(env, thiz);
+        if (mp) {
+            if (libvlc_media_player_has_vout(mp))
+                libvlc_set_screen_id(mp, screenId);
+        }
+    }
+    pthread_mutex_unlock(&vout_android_lock);
+}
+
 void Java_org_videolan_vlc_LibVLC_attachSurface(JNIEnv *env, jobject thiz, jobject surf, jobject gui, jint width, jint height) {
     jclass clz;
     jfieldID fid;
