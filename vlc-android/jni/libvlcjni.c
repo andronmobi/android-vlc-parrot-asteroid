@@ -355,8 +355,11 @@ void Java_org_videolan_vlc_LibVLC_setScreenId(JNIEnv *env, jobject thiz, jint sc
     if (vout_android_surf) {
         libvlc_media_player_t* mp = getMediaPlayer(env, thiz);
         if (mp) {
-            if (libvlc_media_player_has_vout(mp))
+            if (libvlc_media_player_has_vout(mp)) {
+                const char *id = screenId == 0 ? "music" : "ext_music";
                 libvlc_set_screen_id(mp, screenId);
+                libvlc_audio_set_device(mp, id);
+            }
         }
     }
     pthread_mutex_unlock(&vout_android_lock);
