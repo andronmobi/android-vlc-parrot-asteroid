@@ -31,5 +31,9 @@ public interface OnPlayerControlListener {
 
     public abstract void onShowInfo(String info);
 
-    public abstract void onScreen();
+    /**
+     * 
+     * @return Screen id of the current display.
+     */
+    public abstract int onScreen();
 }

@@ -80,7 +80,7 @@ export PATH=${NDK_TOOLCHAIN_PATH}:${PATH}
 ANDROID_PATH="`pwd`"
 
 # 1/ libvlc, libvlccore and its plugins
-TESTED_HASH=d6eeda548
+TESTED_HASH=2a74bb484
 if [ ! -d "vlc" ]; then
     echo "VLC source not found, cloning"
     git clone https://github.com/andronmobi/vlc-parrot-asteroid.git vlc

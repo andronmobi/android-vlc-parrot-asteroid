@@ -342,7 +342,7 @@ jint Java_org_videolan_vlc_LibVLC_getScreenId(JNIEnv *env, jobject thiz) {
         libvlc_media_player_t* mp = getMediaPlayer(env, thiz);
         if (mp) {
             if (libvlc_media_player_has_vout(mp)) {
-                id = 0; // TODO id = libvlc_get_screen_id(mp);
+                id = libvlc_get_screen_id(mp);
             }
         }
     }

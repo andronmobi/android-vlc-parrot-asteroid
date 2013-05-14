@@ -1121,13 +1121,14 @@ public class VideoPlayerActivity extends Activity {
         }
 
         @Override
-        public void onScreen() {
+        public int onScreen() {
             if (mScreenId == -1) {
                 Log.w(TAG, "Can't change screen id");
-                return;
+                return -1;
             }
             mScreenId = (mScreenId == 0) ? 2 : 0;
             mLibVLC.setScreenId(mScreenId);
+            return mScreenId;
         }
     };
 

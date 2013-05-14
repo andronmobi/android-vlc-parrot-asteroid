@@ -78,8 +78,13 @@ public class PlayerControlClassic extends LinearLayout implements IPlayerControl
     private OnClickListener mScreenListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (listener != null)
-                listener.onScreen();
+            if (listener != null) {
+                int screenId = listener.onScreen();
+                if (screenId == 0)
+                    mScreen.setBackgroundResource(R.drawable.ic_screen_normal);
+                else
+                    mScreen.setBackgroundResource(R.drawable.ic_screen_external);
+            }
         }
     };
 
