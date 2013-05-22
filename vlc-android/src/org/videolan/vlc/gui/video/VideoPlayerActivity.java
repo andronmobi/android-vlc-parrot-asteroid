@@ -22,6 +22,7 @@ package org.videolan.vlc.gui.video;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.util.Map;
@@ -101,6 +102,8 @@ public class VideoPlayerActivity extends Activity implements IVideoPlayer {
     private LibVLC mLibVLC;
     private String mLocation;
 
+    private Method mSetTitleMethod;
+
     private static final int SURFACE_BEST_FIT = 0;
     private static final int SURFACE_FIT_HORIZONTAL = 1;
     private static final int SURFACE_FIT_VERTICAL = 2;
@@ -144,7 +147,7 @@ public class VideoPlayerActivity extends Activity implements IVideoPlayer {
     private boolean mIsLocked = false;
     private int mLastAudioTrack = -1;
     private int mLastSpuTrack = -2;
-    private int mScreenId = -1;
+    private int mScreenId = 0;
 
     /**
      * For uninterrupted switching between audio and video mode
@@ -277,6 +280,16 @@ public class VideoPlayerActivity extends Activity implements IVideoPlayer {
         mSurfaceHolder.addCallback(mSurfaceCallback);
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
+        // Use reflection to call a hidden method of SurfaceView added by Parrot.
+        Class<?> params[] = new Class[1];
+        params[0] = String.class;
+        try {
+            mSetTitleMethod = mSurface.getClass().getDeclaredMethod("setTitle", params);
+        } catch (NoSuchMethodException e) {
+            Log.e(TAG, e.toString());
+            mSetTitleMethod = null;
+        }
+
         mSeekbar = (SeekBar) findViewById(R.id.player_overlay_seekbar);
         mSeekbar.setOnSeekBarChangeListener(mSeekListener);
 
@@ -350,13 +363,16 @@ public class VideoPlayerActivity extends Activity implements IVideoPlayer {
          * To workaround that, we keep the last known position in the playlist
          * in savedIndexPosition to be able to restore it during onResume().
          */
-        if (savedIndexPosition >= 0)
-            mLibVLC.stop();
+        if (savedIndexPosition >= 0) {
+            if (mScreenId == 0 || isFinishing())
+                mLibVLC.stop();
+        }
         else {
             /* FIXME when the playback is started externally from AudioService
              * we don't have a savedIndexPosition. Use pause as a fallback until
              * we find a solution.
              */
+            Log.w(TAG, "libVLC is paused FIXME");
             mLibVLC.pause();
         }
 
@@ -700,9 +716,10 @@ public class VideoPlayerActivity extends Activity implements IVideoPlayer {
     private void handleVout(Message msg) {
         if (msg.getData().getInt("data") == 1 && !mEndReached) {
             mScreenId = mLibVLC.getScreenId();
-            if (mScreenId == -1)
+            if (mScreenId == -1) {
                 Log.e(TAG, "Can't detect screen id");
-            //set appropriate icon for the button changing a screen.
+                mScreenId = 0;
+            }
         }
         if (msg.getData().getInt("data") == 0 && !mEndReached) {
             /* Video track lost, open in audio mode */
@@ -1124,11 +1141,17 @@ public class VideoPlayerActivity extends Activity implements IVideoPlayer {
 
         @Override
         public int onScreen() {
-            if (mScreenId == -1) {
-                Log.w(TAG, "Can't change screen id");
-                return -1;
-            }
             mScreenId = (mScreenId == 0) ? 2 : 0;
+            try {
+                // If a window of SurfaceView has a title VoutVideoView
+                // than the surface wont be destroyed by WindowManagerService
+                // while video is playing on external screen in background mode.
+                mSetTitleMethod.invoke(mSurface, mScreenId == 0 ? "VideoView" : "VoutVideoView");
+            } catch (IllegalAccessException e) {
+                Log.e(TAG, e.toString());
+            } catch (InvocationTargetException e) {
+                Log.e(TAG, e.toString());
+            }
             mLibVLC.setScreenId(mScreenId);
             return mScreenId;
         }
@@ -1218,12 +1241,15 @@ public class VideoPlayerActivity extends Activity implements IVideoPlayer {
 
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
-            doLoading();
+            if (mScreenId == 0)
+                doLoading();
         }
 
         @Override
         public void surfaceDestroyed(SurfaceHolder holder) {
-            mLibVLC.detachSurface();
+            if (mScreenId == 0 || VideoPlayerActivity.this.isFinishing()) {
+                mLibVLC.detachSurface();
+            }
         }
     };
 

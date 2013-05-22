@@ -49,7 +49,8 @@ sh $VLC_SOURCEDIR/configure --host=$TARGET_TUPLE --build=x86_64-unknown-linux $E
                 --enable-swscale \
                 --enable-avcodec \
                 --enable-opus \
-                --enable-opensles \
+                --disable-opensles \
+                --enable-android-audiotrack \
                 --disable-android-surface \
                 --enable-android-ti-overlay \
                 --enable-mkv \

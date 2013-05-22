@@ -185,8 +185,11 @@ public class LibVLC {
     }
 
     public void setAout(int aout) {
-        if (aout < 0)
-            this.aout = LibVlcUtil.isGingerbreadOrLater() ? AOUT_OPENSLES : AOUT_AUDIOTRACK_JAVA;
+        if (aout < 0) {
+            //this.aout = LibVlcUtil.isGingerbreadOrLater() ? AOUT_OPENSLES : AOUT_AUDIOTRACK_JAVA;
+            // Use audiotrack module beacuse external music stream is implemented only in it.
+            this.aout = AOUT_AUDIOTRACK;
+        }
         else
             this.aout = aout;
     }
