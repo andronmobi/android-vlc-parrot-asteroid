@@ -50,6 +50,9 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.KeyguardManager;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -87,6 +90,7 @@ import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -103,6 +107,11 @@ public class VideoPlayerActivity extends Activity implements IVideoPlayer {
     private String mLocation;
 
     private Method mSetTitleMethod;
+    private Notification mNotification;
+    private NotificationManager mNotificationManager;
+
+    private static final int NOTIFY_EXTERNAL_DISPLAY = 1;
+    private static final int NOTIFICATION_FLAG_CUSTOM_EVENT = 0x100; // For GingerBread
 
     private static final int SURFACE_BEST_FIT = 0;
     private static final int SURFACE_FIT_HORIZONTAL = 1;
@@ -327,6 +336,18 @@ public class VideoPlayerActivity extends Activity implements IVideoPlayer {
         setRequestedOrientation(mScreenOrientation != 100
                 ? mScreenOrientation
                 : getScreenOrientation());
+
+        Intent intent = new Intent(this, VideoPlayerActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        int icon = R.drawable.video_notif_external_display_play;
+        long when = System.currentTimeMillis();
+        mNotification = new Notification(icon, "", when);
+        mNotification.flags |= NOTIFICATION_FLAG_CUSTOM_EVENT | Notification.FLAG_NO_CLEAR;
+        RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notif_background);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mNotification.contentIntent = pendingIntent;
+        mNotification.contentView = contentView;
     }
 
     @Override
@@ -396,6 +417,33 @@ public class VideoPlayerActivity extends Activity implements IVideoPlayer {
         }
 
         AudioServiceController.getInstance().unbindAudioService(this);
+
+        if (mScreenId == 2) {
+            if (isFinishing()) {
+                try {
+                    mSetTitleMethod.invoke(mSurface, "VideoView");
+                } catch (IllegalAccessException e) {
+                    Log.e(TAG, e.toString());
+                } catch (InvocationTargetException e) {
+                    Log.e(TAG, e.toString());
+                }
+            } else {
+                String firstLine;
+                int icon;
+                if (mLibVLC.isPlaying()) {
+                    firstLine = getString(R.string.DISP_TEXT_EXTERNAL_VIDEO_PLAY_BACKGROUND);
+                    icon = R.drawable.video_notif_external_display_play;
+                }
+                else {
+                    firstLine = getString(R.string.DISP_TEXT_EXTERNAL_VIDEO_PAUSED_BACKGROUND);
+                    icon = R.drawable.video_notif_external_display_pause;
+                }
+                mNotification.tickerText = firstLine;
+                mNotification.icon = icon;
+                mNotification.contentView.setTextViewText(R.id.firstLine, firstLine);
+                mNotificationManager.notify(NOTIFY_EXTERNAL_DISPLAY, mNotification);
+            }
+        }
     }
 
     @Override
@@ -415,6 +463,7 @@ public class VideoPlayerActivity extends Activity implements IVideoPlayer {
         em.removeHandler(eventHandler);
 
         mAudioManager = null;
+        mNotificationManager.cancelAll();
     }
 
     private void doLoading() {
@@ -443,6 +492,7 @@ public class VideoPlayerActivity extends Activity implements IVideoPlayer {
     protected void onResume() {
         super.onResume();
         AudioServiceController.getInstance().bindAudioService(this);
+        mNotificationManager.cancel(NOTIFY_EXTERNAL_DISPLAY);
     }
 
     public static void start(Context context, String location) {

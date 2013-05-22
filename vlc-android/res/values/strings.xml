@@ -213,6 +213,10 @@
     <string name="set_locale_popup">Quit and reset VLC for changes to take effect.</string>
     <string name="quit">Quit application</string>
 
+    <string name="DISP_TEXT_EXTERNAL_VIDEO_PAUSED_BACKGROUND">Video is paused on external display</string>
+    <string name="DISP_TEXT_EXTERNAL_VIDEO_PLAY_BACKGROUND">Video is playing on external display</string>
+    <string name="DISP_TEXT_RETURN_TO_VIDEO_APP">Select to return to the  application</string>
+
     <string-array name="screen_orientation_list">
         <item>@string/screen_orientation_sensor</item>
         <item>@string/screen_orientation_start_lock</item>
