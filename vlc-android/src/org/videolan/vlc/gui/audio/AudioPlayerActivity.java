@@ -20,14 +20,15 @@
 
 package org.videolan.vlc.gui.audio;
 
-import org.videolan.vlc.AudioService;
-import org.videolan.vlc.AudioServiceController;
+import org.videolan.vlc.MediaService;
+import org.videolan.vlc.MediaServiceController;
 import org.videolan.vlc.R;
 import org.videolan.vlc.RepeatType;
 import org.videolan.vlc.Util;
 import org.videolan.vlc.gui.CommonDialogs;
 import org.videolan.vlc.gui.MainActivity;
 import org.videolan.vlc.interfaces.IAudioPlayer;
+import org.videolan.vlc.interfaces.IMediaPlayer;
 
 import android.app.Activity;
 import android.content.Context;
@@ -46,7 +47,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
-public class AudioPlayerActivity extends Activity implements IAudioPlayer {
+public class AudioPlayerActivity extends Activity implements IMediaPlayer {
     public final static String TAG = "VLC/AudioPlayerActivity";
 
     private ImageView mCover;
@@ -64,7 +65,7 @@ public class AudioPlayerActivity extends Activity implements IAudioPlayer {
     private ImageButton mAdvFunc;
     private SeekBar mTimeline;
 
-    private AudioServiceController mAudioController;
+    private MediaServiceController mAudioController;
     private boolean mShowRemainingTime = false;
     private String lastTitle;
 
@@ -114,22 +115,22 @@ public class AudioPlayerActivity extends Activity implements IAudioPlayer {
 
         this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        mAudioController = AudioServiceController.getInstance();
+        mAudioController = MediaServiceController.getInstance();
         lastTitle = "";
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        AudioServiceController.getInstance().bindAudioService(this);
-        mAudioController.addAudioPlayer(this);
+        MediaServiceController.getInstance().bindMediaService(this);
+        mAudioController.addMediaPlayer(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mAudioController.removeAudioPlayer(this);
-        AudioServiceController.getInstance().unbindAudioService(this);
+        mAudioController.removeMediaPlayer(this);
+        MediaServiceController.getInstance().unbindMediaService(this);
     }
 
     @Override
@@ -157,7 +158,7 @@ public class AudioPlayerActivity extends Activity implements IAudioPlayer {
     public void onBackPressed() {
         Bundle extras = getIntent().getExtras();
 
-        if (extras != null && extras.containsKey(AudioService.START_FROM_NOTIFICATION)) {
+        if (extras != null && extras.containsKey(MediaService.START_FROM_NOTIFICATION)) {
             // Launched from notification (adding the MainActivity to the backstack)
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -324,4 +325,15 @@ public class AudioPlayerActivity extends Activity implements IAudioPlayer {
     public void showAdvanceFunction(View v) {
         CommonDialogs.advancedOptions(this, v);
     }
+
+    @Override
+    public void onMediaServiceConnect() {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void onMediaServiceDisconnect() {
+        // TODO Auto-generated method stub
+    }
+
 }

@@ -30,6 +30,7 @@ import org.videolan.vlc.MediaLibrary;
 import org.videolan.vlc.R;
 import org.videolan.vlc.Util;
 import org.videolan.vlc.WeakHandler;
+import org.videolan.vlc.gui.media.MediaPlayerActivity;
 
 import android.app.ListActivity;
 import android.graphics.Bitmap;
@@ -94,7 +95,7 @@ public class MediaInfoActivity extends ListActivity {
     }
 
     public void onPlayClick(View v) {
-        VideoPlayerActivity.start(this, mItem.getLocation());
+        MediaPlayerActivity.start(this, mItem.getLocation());
     }
 
     Runnable mLoadImage = new Runnable() {

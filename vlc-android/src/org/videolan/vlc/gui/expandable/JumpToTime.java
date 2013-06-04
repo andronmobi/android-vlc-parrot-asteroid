@@ -27,7 +27,7 @@ import kankan.wheel.widget.WheelView;
 import kankan.wheel.widget.adapters.NumericWheelAdapter;
 
 import org.videolan.libvlc.LibVLC;
-import org.videolan.vlc.AudioServiceController;
+import org.videolan.vlc.MediaServiceController;
 import org.videolan.vlc.R;
 import org.videolan.vlc.widget.ExpandableLayout;
 
@@ -56,8 +56,8 @@ public class JumpToTime extends ExpandableLayout {
         final Button okButton = (Button) findViewById(R.id.ok);
         okButton.setOnClickListener(mOnOkListener);
 
-        long currentTime = !isInEditMode() ? AudioServiceController.getInstance().getTime() : 0;
-        int length = !isInEditMode() ? AudioServiceController.getInstance().getLength() : 0;
+        long currentTime = !isInEditMode() ? MediaServiceController.getInstance().getTime() : 0;
+        int length = !isInEditMode() ? MediaServiceController.getInstance().getLength() : 0;
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 
         // Limit wheel values

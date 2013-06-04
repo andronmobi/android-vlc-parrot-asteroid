@@ -1,5 +1,5 @@
 /*****************************************************************************
- * AudioServiceController.java
+ * AudioVideoServiceController.java
  *****************************************************************************
  * Copyright © 2011-2012 VLC authors and VideoLAN
  *
@@ -23,12 +23,13 @@ package org.videolan.vlc;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-import org.videolan.vlc.interfaces.IAudioPlayer;
-import org.videolan.vlc.interfaces.IAudioPlayerControl;
-import org.videolan.vlc.interfaces.IAudioService;
-import org.videolan.vlc.interfaces.IAudioServiceCallback;
+import org.videolan.vlc.interfaces.IMediaPlayer;
+import org.videolan.vlc.interfaces.IMediaPlayerControl;
+import org.videolan.vlc.interfaces.IMediaService;
+import org.videolan.vlc.interfaces.IMediaServiceCallback;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -40,29 +41,32 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Surface;
 
-public class AudioServiceController implements IAudioPlayerControl {
-    public static final String TAG = "VLC/AudioServiceContoller";
+public class MediaServiceController implements IMediaPlayerControl {
+    public static final String TAG = "VLC/MediaServiceContoller";
 
-    private static AudioServiceController mInstance;
+    private static MediaServiceController mInstance;
     private static boolean mIsBound = false;
-    private IAudioService mAudioServiceBinder;
+    private IMediaService mAudioServiceBinder;
     private ServiceConnection mAudioServiceConnection;
-    private final ArrayList<IAudioPlayer> mAudioPlayer;
-    private final IAudioServiceCallback mCallback = new IAudioServiceCallback.Stub() {
+    private final ArrayList<IMediaPlayer> mPlayers;
+    private HashMap<Integer, Context> mBoundClients = new HashMap<Integer, Context>();
+    
+    private final IMediaServiceCallback mCallback = new IMediaServiceCallback.Stub() {
         @Override
         public void update() throws RemoteException {
             updateAudioPlayer();
         }
     };
 
-    private AudioServiceController() {
-        mAudioPlayer = new ArrayList<IAudioPlayer>();
+    private MediaServiceController() {
+        mPlayers = new ArrayList<IMediaPlayer>();
     }
 
-    public static AudioServiceController getInstance() {
+    public static MediaServiceController getInstance() {
         if (mInstance == null) {
-            mInstance = new AudioServiceController();
+            mInstance = new MediaServiceController();
         }
         return mInstance;
     }
@@ -70,18 +74,22 @@ public class AudioServiceController implements IAudioPlayerControl {
     /**
      * Bind to audio service if it is running
      */
-    public void bindAudioService(Context context) {
+    public void bindMediaService(Context context) {
         if (context == null) {
             Log.w(TAG, "bindAudioService() with null Context. Ooops" );
             return;
         }
-        context = context.getApplicationContext();
+        Log.d(TAG, "bindAudioService() " +  context.toString());
+        Context appContext = context.getApplicationContext();
+
+        if (!mBoundClients.containsKey(context.hashCode()))
+            mBoundClients.put(context.hashCode(), context);
 
         if (!mIsBound) {
-            Intent service = new Intent(context, MediaService.class);
-            context.startService(service);
+            Intent service = new Intent(appContext, MediaService.class);
+            appContext.startService(service);
 
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(appContext);
             final boolean enableHS = prefs.getBoolean("enable_headset_detection", true);
 
             // Setup audio service connection
@@ -91,6 +99,8 @@ public class AudioServiceController implements IAudioPlayerControl {
                     Log.d(TAG, "Service Disconnected");
                     mAudioServiceBinder = null;
                     mIsBound = false;
+                    for (IMediaPlayer player : mPlayers)
+                        player.onMediaServiceDisconnect();
                 }
 
                 @Override
@@ -98,49 +108,58 @@ public class AudioServiceController implements IAudioPlayerControl {
                     if (!mIsBound) // Can happen if unbind is called quickly before this callback
                         return;
                     Log.d(TAG, "Service Connected");
-                    mAudioServiceBinder = IAudioService.Stub.asInterface(service);
+                    mAudioServiceBinder = IMediaService.Stub.asInterface(service);
 
                     // Register controller to the service
                     try {
-                        mAudioServiceBinder.addAudioCallback(mCallback);
+                        mAudioServiceBinder.addMediaCallback(mCallback);
                         mAudioServiceBinder.detectHeadset(enableHS);
                     } catch (RemoteException e) {
                         Log.e(TAG, "remote procedure call failed: addAudioCallback()");
                     }
+                    for (IMediaPlayer player : mPlayers)
+                        player.onMediaServiceConnect();
                     updateAudioPlayer();
                 }
             };
 
-            mIsBound = context.bindService(service, mAudioServiceConnection, Context.BIND_AUTO_CREATE);
+            mIsBound = appContext.bindService(service, mAudioServiceConnection, Context.BIND_AUTO_CREATE);
         } else {
             // Register controller to the service
             try {
                 if (mAudioServiceBinder != null)
-                    mAudioServiceBinder.addAudioCallback(mCallback);
+                    mAudioServiceBinder.addMediaCallback(mCallback);
             } catch (RemoteException e) {
                 Log.e(TAG, "remote procedure call failed: addAudioCallback()");
             }
         }
     }
 
-    public void unbindAudioService(Context context) {
+    public void unbindMediaService(Context context) {
         if (context == null) {
             Log.w(TAG, "unbindAudioService() with null Context. Ooops" );
             return;
         }
-        context = context.getApplicationContext();
+        Log.d(TAG, "unbindAudioService() " +  context.toString());
+        Context appContext = context.getApplicationContext();
+
+        if (mBoundClients.containsKey(context.hashCode()))
+            mBoundClients.remove(context.hashCode());
 
         if (mIsBound) {
-            mIsBound = false;
             try {
                 if (mAudioServiceBinder != null)
-                    mAudioServiceBinder.removeAudioCallback(mCallback);
+                    mAudioServiceBinder.removeMediaCallback(mCallback);
             } catch (RemoteException e) {
                 Log.e(TAG, "remote procedure call failed: removeAudioCallback()");
             }
-            context.unbindService(mAudioServiceConnection);
-            mAudioServiceBinder = null;
-            mAudioServiceConnection = null;
+            if (mBoundClients.isEmpty()) {
+                mIsBound = false;
+                Log.d(TAG, "unbindAudioService() no clients");
+                appContext.unbindService(mAudioServiceConnection);
+                mAudioServiceBinder = null;
+                mAudioServiceConnection = null;
+            }
         }
     }
 
@@ -148,17 +167,17 @@ public class AudioServiceController implements IAudioPlayerControl {
      * Add a AudioPlayer
      * @param ap
      */
-    public void addAudioPlayer(IAudioPlayer ap) {
-        mAudioPlayer.add(ap);
+    public void addMediaPlayer(IMediaPlayer ap) {
+        mPlayers.add(ap);
     }
 
     /**
      * Remove AudioPlayer from list
      * @param ap
      */
-    public void removeAudioPlayer(IAudioPlayer ap) {
-        if (mAudioPlayer.contains(ap)) {
-            mAudioPlayer.remove(ap);
+    public void removeMediaPlayer(IMediaPlayer ap) {
+        if (mPlayers.contains(ap)) {
+            mPlayers.remove(ap);
         }
     }
 
@@ -166,7 +185,7 @@ public class AudioServiceController implements IAudioPlayerControl {
      * Update all AudioPlayer
      */
     private void updateAudioPlayer() {
-        for (IAudioPlayer player : mAudioPlayer)
+        for (IMediaPlayer player : mPlayers)
             player.update();
     }
 
@@ -174,7 +193,7 @@ public class AudioServiceController implements IAudioPlayerControl {
      * This is a handy utility function to call remote procedure calls from mAudioServiceBinder
      * to reduce code duplication across methods of AudioServiceController.
      *
-     * @param instance The instance of IAudioService to call, usually mAudioServiceBinder
+     * @param instance The instance of IMediaService to call, usually mAudioServiceBinder
      * @param returnType Return type of the method being called
      * @param defaultValue Default value to return in case of null or exception
      * @param functionName The function name to call, e.g. "stop"
@@ -182,13 +201,13 @@ public class AudioServiceController implements IAudioPlayerControl {
      * @param parameters List of parameters. Must be in same order as parameterTypes. Pass null if none.
      * @return The results of the RPC or defaultValue if error
      */
-    private <T> T remoteProcedureCall(IAudioService instance, Class<T> returnType, T defaultValue, String functionName, Class<?> parameterTypes[], Object parameters[]) {
+    private <T> T remoteProcedureCall(IMediaService instance, Class<T> returnType, T defaultValue, String functionName, Class<?> parameterTypes[], Object parameters[]) {
         if(instance == null) {
             return defaultValue;
         }
 
         try {
-            Method m = IAudioService.class.getMethod(functionName, parameterTypes);
+            Method m = IMediaService.class.getMethod(functionName, parameterTypes);
             @SuppressWarnings("unchecked")
             T returnVal = (T) m.invoke(instance, parameters);
             return returnVal;
@@ -220,6 +239,8 @@ public class AudioServiceController implements IAudioPlayerControl {
     }
 
     public void load(List<String> mediaPathList, int position, boolean libvlcBacked, boolean noVideo) {
+        Log.w(TAG, "load mAudioServiceBinder is null, " + (mAudioServiceBinder) != null ? "false" : "true");
+        Log.w(TAG, "load mAudioServiceBinder = " + mAudioServiceBinder.toString());
         remoteProcedureCall(mAudioServiceBinder, Void.class, (Void)null, "load",
                 new Class<?>[] { List.class, int.class, boolean.class, boolean.class },
                 new Object[] { mediaPathList, position, libvlcBacked, noVideo } );
@@ -232,6 +253,8 @@ public class AudioServiceController implements IAudioPlayerControl {
     }
 
     public void append(List<String> mediaPathList) {
+        Log.w(TAG, "append mAudioServiceBinder is null, " + (mAudioServiceBinder) != null ? "false" : "true");
+        Log.w(TAG, "append mAudioServiceBinder = " + mAudioServiceBinder.toString());
         remoteProcedureCall(mAudioServiceBinder, Void.class, (Void)null, "append",
                 new Class<?>[] { List.class },
                 new Object[] { mediaPathList } );
@@ -371,5 +394,29 @@ public class AudioServiceController implements IAudioPlayerControl {
     @Override
     public float getRate() {
         return remoteProcedureCall(mAudioServiceBinder, Float.class, (float) 1.0, "getRate", null, null);
+    }
+
+    @Override
+    public void attachSurface(Surface surface, int width, int height) {
+        remoteProcedureCall(mAudioServiceBinder, Void.class, (Void)null, "attachSurface",
+                new Class<?>[] { Surface.class, int.class, int.class},
+                new Object[] { surface, width, height} );
+    }
+
+    @Override
+    public void detachSurface() {
+        remoteProcedureCall(mAudioServiceBinder, Void.class, (Void) null, "detachSurface", null, null);
+    }
+
+    @Override
+    public void setScreenId(int id) {
+        remoteProcedureCall(mAudioServiceBinder, Void.class, (Void) null, "setScreenId", 
+                new Class<?>[] { int.class},
+                new Object[] { id } );        
+    }
+
+    @Override
+    public int getScreenId() {
+        return remoteProcedureCall(mAudioServiceBinder, int.class, 0, "getScreenId", null, null);
     }
 }

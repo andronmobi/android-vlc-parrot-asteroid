@@ -21,8 +21,8 @@
 package org.videolan.vlc.gui;
 
 import org.videolan.libvlc.LibVLC;
-import org.videolan.vlc.AudioService;
-import org.videolan.vlc.AudioServiceController;
+import org.videolan.vlc.MediaService;
+import org.videolan.vlc.MediaServiceController;
 import org.videolan.vlc.BitmapCache;
 import org.videolan.vlc.MediaDatabase;
 import org.videolan.vlc.R;
@@ -94,7 +94,7 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
                     @Override
                     public boolean onPreferenceClick(Preference preference) {
                         CheckBoxPreference checkboxHS = (CheckBoxPreference) preference;
-                        AudioServiceController.getInstance().detectHeadset(checkboxHS.isChecked());
+                        MediaServiceController.getInstance().detectHeadset(checkboxHS.isChecked());
                         return true;
                     }
                 });
@@ -213,22 +213,22 @@ public class PreferencesActivity extends PreferenceActivity implements OnSharedP
     @Override
     protected void onResume() {
         super.onResume();
-        AudioServiceController.getInstance().bindAudioService(this);
+        MediaServiceController.getInstance().bindMediaService(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        AudioServiceController.getInstance().unbindAudioService(this);
+        MediaServiceController.getInstance().unbindMediaService(this);
     }
 
     private void restartService(Context context) {
-        Intent service = new Intent(context, AudioService.class);
+        Intent service = new Intent(context, MediaService.class);
 
-        AudioServiceController.getInstance().unbindAudioService(PreferencesActivity.this);
+        MediaServiceController.getInstance().unbindMediaService(PreferencesActivity.this);
         context.stopService(service);
 
         context.startService(service);
-        AudioServiceController.getInstance().bindAudioService(PreferencesActivity.this);
+        MediaServiceController.getInstance().bindMediaService(PreferencesActivity.this);
     }
 }

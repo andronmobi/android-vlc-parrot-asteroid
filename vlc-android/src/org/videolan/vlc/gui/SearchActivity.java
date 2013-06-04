@@ -22,13 +22,13 @@ package org.videolan.vlc.gui;
 
 import java.util.ArrayList;
 
-import org.videolan.vlc.AudioServiceController;
+import org.videolan.vlc.MediaServiceController;
 import org.videolan.vlc.MediaDatabase;
 import org.videolan.vlc.Media;
 import org.videolan.vlc.MediaLibrary;
 import org.videolan.vlc.R;
 import org.videolan.vlc.gui.audio.AudioPlayerActivity;
-import org.videolan.vlc.gui.video.VideoPlayerActivity;
+import org.videolan.vlc.gui.media.MediaPlayerActivity;
 
 import android.app.ListActivity;
 import android.app.SearchManager;
@@ -90,13 +90,13 @@ public class SearchActivity extends ListActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        AudioServiceController.getInstance().bindAudioService(this);
+        MediaServiceController.getInstance().bindMediaService(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        AudioServiceController.getInstance().unbindAudioService(this);
+        MediaServiceController.getInstance().unbindMediaService(this);
     }
 
     @Override
@@ -245,7 +245,7 @@ public class SearchActivity extends ListActivity {
             // open media in the player
             Media item = (Media) getListAdapter().getItem(position - 1);
             if (item.getType() == Media.TYPE_VIDEO) {
-                VideoPlayerActivity.start(this, item.getLocation());
+                MediaPlayerActivity.start(this, item.getLocation());
             } else {
                 ArrayList<String> arr = new ArrayList<String>();
                 for (int i = 0; i < getListAdapter().getCount(); i++) {
@@ -253,7 +253,7 @@ public class SearchActivity extends ListActivity {
                     if (audioItem.getType() == Media.TYPE_AUDIO)
                         arr.add(audioItem.getLocation());
                 }
-                AudioServiceController.getInstance().load(arr, arr.indexOf(item.getLocation()));
+                MediaServiceController.getInstance().load(arr, arr.indexOf(item.getLocation()));
                 AudioPlayerActivity.start(this);
             }
             super.onListItemClick(l, v, position, id);

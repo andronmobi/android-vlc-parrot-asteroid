@@ -72,7 +72,7 @@
             android:name=".gui.video.MediaInfoActivity"
             android:theme="@android:style/Theme.NoTitleBar" />
         <activity
-            android:name=".gui.video.VideoPlayerActivity"
+            android:name=".gui.media.MediaPlayerActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:launchMode="singleTop">
@@ -386,7 +386,7 @@
             android:theme="@android:style/Theme.NoTitleBar"
             android:launchMode="singleTop" />
 
-        <service android:name=".AudioService" />
+        <service android:name=".MediaService" />
 
         <receiver
             android:name="PhoneStateReceiver">

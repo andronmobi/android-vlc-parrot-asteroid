@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.videolan.vlc.AudioServiceController;
+import org.videolan.vlc.MediaServiceController;
 import org.videolan.vlc.Media;
 import org.videolan.vlc.MediaLibrary;
 import org.videolan.vlc.R;
@@ -55,7 +55,7 @@ public class AudioListFragment extends SherlockListFragment {
 
     public final static String TAG = "VLC/AudioListFragment";
 
-    private AudioServiceController mAudioController;
+    private MediaServiceController mAudioController;
     private MediaLibrary mMediaLibrary;
 
     private TextView mTitle;
@@ -76,7 +76,7 @@ public class AudioListFragment extends SherlockListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mAudioController = AudioServiceController.getInstance();
+        mAudioController = MediaServiceController.getInstance();
 
         mMediaLibrary = MediaLibrary.getInstance(getActivity());
 
@@ -248,8 +248,8 @@ public class AudioListFragment extends SherlockListFragment {
 
         if (name == null || mode == AudioBrowserFragment.MODE_SONG) {
             mTitle.setText(R.string.songs);
-            itemList = AudioServiceController.getInstance().getItems();
-            currentItem = AudioServiceController.getInstance().getItem();
+            itemList = MediaServiceController.getInstance().getItems();
+            currentItem = MediaServiceController.getInstance().getItem();
             audioList = MediaLibrary.getInstance(getActivity()).getMediaItems(itemList);
         }
         else {

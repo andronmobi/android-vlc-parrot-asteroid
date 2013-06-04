@@ -83,37 +83,37 @@ public class RemoteControlClientReceiver extends BroadcastReceiver {
                         case KeyEvent.ACTION_UP:
                             // long click
                             if (time - mHeadsetDownTime >= 1000) {
-                                i = new Intent(AudioService.ACTION_REMOTE_BACKWARD);
+                                i = new Intent(MediaService.ACTION_REMOTE_BACKWARD);
                                 time = 0;
                                 // double click
                             } else if (time - mHeadsetUpTime <= 500) {
-                                i = new Intent(AudioService.ACTION_REMOTE_FORWARD);
+                                i = new Intent(MediaService.ACTION_REMOTE_FORWARD);
                             }
                             // one click
                             else {
                                 if (mLibVLC.isPlaying())
-                                    i = new Intent(AudioService.ACTION_REMOTE_PAUSE);
+                                    i = new Intent(MediaService.ACTION_REMOTE_PAUSE);
                                 else
-                                    i = new Intent(AudioService.ACTION_REMOTE_PLAY);
+                                    i = new Intent(MediaService.ACTION_REMOTE_PLAY);
                             }
                             mHeadsetUpTime = time;
                             break;
                     }
                     break;
                 case KeyEvent.KEYCODE_MEDIA_PLAY:
-                    i = new Intent(AudioService.ACTION_REMOTE_PLAY);
+                    i = new Intent(MediaService.ACTION_REMOTE_PLAY);
                     break;
                 case KeyEvent.KEYCODE_MEDIA_PAUSE:
-                    i = new Intent(AudioService.ACTION_REMOTE_PAUSE);
+                    i = new Intent(MediaService.ACTION_REMOTE_PAUSE);
                     break;
                 case KeyEvent.KEYCODE_MEDIA_STOP:
-                    i = new Intent(AudioService.ACTION_REMOTE_STOP);
+                    i = new Intent(MediaService.ACTION_REMOTE_STOP);
                     break;
                 case KeyEvent.KEYCODE_MEDIA_NEXT:
-                    i = new Intent(AudioService.ACTION_REMOTE_FORWARD);
+                    i = new Intent(MediaService.ACTION_REMOTE_FORWARD);
                     break;
                 case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                    i = new Intent(AudioService.ACTION_REMOTE_BACKWARD);
+                    i = new Intent(MediaService.ACTION_REMOTE_BACKWARD);
                     break;
             }
 

@@ -20,7 +20,7 @@
  *****************************************************************************/
 package org.videolan.vlc.gui;
 
-import org.videolan.vlc.AudioServiceController;
+import org.videolan.vlc.MediaServiceController;
 import org.videolan.vlc.R;
 import org.videolan.vlc.gui.audio.AudioPlayerActivity;
 import android.content.Intent;
@@ -59,7 +59,7 @@ public class HistoryFragment extends SherlockListFragment {
 
     @Override
     public void onListItemClick(ListView l, View v, int p, long id) {
-        AudioServiceController audioController = AudioServiceController.getInstance();
+        MediaServiceController audioController = MediaServiceController.getInstance();
 
         audioController.load(mHistoryAdapter.getAllURIs(), p, true, true);
         Intent intent = new Intent(getActivity(), AudioPlayerActivity.class);

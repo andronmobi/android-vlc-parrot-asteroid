@@ -26,7 +26,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.videolan.android.ui.SherlockGridFragment;
-import org.videolan.vlc.AudioServiceController;
+import org.videolan.vlc.MediaServiceController;
 import org.videolan.vlc.Media;
 import org.videolan.vlc.MediaDatabase;
 import org.videolan.vlc.MediaLibrary;
@@ -38,6 +38,7 @@ import org.videolan.vlc.WeakHandler;
 import org.videolan.vlc.gui.CommonDialogs;
 import org.videolan.vlc.gui.PreferencesActivity;
 import org.videolan.vlc.gui.audio.AudioPlayerActivity;
+import org.videolan.vlc.gui.media.MediaPlayerActivity;
 import org.videolan.vlc.interfaces.ISortable;
 
 import android.annotation.TargetApi;
@@ -257,12 +258,12 @@ public class VideoGridFragment extends SherlockGridFragment implements ISortable
 
     protected void playVideo(int position, boolean fromStart) {
         Media item = (Media) getListAdapter().getItem(position);
-        VideoPlayerActivity.start(getActivity(), item.getLocation(), fromStart);
+        MediaPlayerActivity.start(getActivity(), item.getLocation(), fromStart);
     }
 
     protected void playAudio(int position) {
         Media item = (Media) getListAdapter().getItem(position);
-        AudioServiceController.getInstance().load(item.getLocation(), 0, false, true);
+        MediaServiceController.getInstance().load(item.getLocation(), 0, false, true);
         AudioPlayerActivity.start(getActivity());
     }
 

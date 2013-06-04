@@ -22,8 +22,8 @@ package org.videolan.vlc.gui;
 
 import org.videolan.libvlc.LibVlcException;
 import org.videolan.libvlc.LibVlcUtil;
-import org.videolan.vlc.AudioService;
-import org.videolan.vlc.AudioServiceController;
+import org.videolan.vlc.MediaService;
+import org.videolan.vlc.MediaServiceController;
 import org.videolan.vlc.MediaLibrary;
 import org.videolan.vlc.R;
 import org.videolan.vlc.Util;
@@ -90,7 +90,7 @@ public class MainActivity extends SherlockFragmentActivity {
     private SlidingMenu mMenu;
     private SidebarAdapter mSidebarAdapter;
     private AudioMiniPlayer mAudioPlayer;
-    private AudioServiceController mAudioController;
+    private MediaServiceController mAudioController;
 
     private View mInfoLayout;
     private ProgressBar mInfoProgress;
@@ -242,14 +242,15 @@ public class MainActivity extends SherlockFragmentActivity {
         });
 
         /* Set up the mini audio player */
-        mAudioPlayer = new AudioMiniPlayer();
-        mAudioController = AudioServiceController.getInstance();
-        mAudioPlayer.setAudioPlayerControl(mAudioController);
-        mAudioPlayer.update();
-
-        getSupportFragmentManager().beginTransaction()
-            .replace(R.id.audio_mini_player, mAudioPlayer)
-            .commit();
+        // TODO use mini player
+//        mAudioPlayer = new AudioMiniPlayer(); 
+        mAudioController = MediaServiceController.getInstance();
+//        mAudioPlayer.setAudioPlayerControl(mAudioController);
+//        mAudioPlayer.update();
+//
+//        getSupportFragmentManager().beginTransaction()
+//            .replace(R.id.audio_mini_player, mAudioPlayer)
+//            .commit();
 
         /* Show info/alpha/beta Warning */
         if (mSettings.getInt(PREF_SHOW_INFO, -1) != mVersionNumber)
@@ -291,12 +292,13 @@ public class MainActivity extends SherlockFragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mAudioController.addAudioPlayer(mAudioPlayer);
-        AudioServiceController.getInstance().bindAudioService(this);
+        // TODO use mini player
+//        mAudioController.addAudioPlayer(mAudioPlayer);
+        MediaServiceController.getInstance().bindMediaService(this);
 
         /* FIXME: this is used to avoid having MainActivity twice in the backstack */
-        if (getIntent().hasExtra(AudioService.START_FROM_NOTIFICATION))
-            getIntent().removeExtra(AudioService.START_FROM_NOTIFICATION);
+        if (getIntent().hasExtra(MediaService.START_FROM_NOTIFICATION))
+            getIntent().removeExtra(MediaService.START_FROM_NOTIFICATION);
 
         /* Load media items from database and storage */
         if (mScanNeeded)
@@ -377,8 +379,9 @@ public class MainActivity extends SherlockFragmentActivity {
         editor.putString("fragment", mCurrentFragment);
         editor.commit();
 
-        mAudioController.removeAudioPlayer(mAudioPlayer);
-        AudioServiceController.getInstance().unbindAudioService(this);
+        // TODO use mini player
+        //mAudioController.removeAudioPlayer(mAudioPlayer);
+        MediaServiceController.getInstance().unbindMediaService(this);
     }
 
     @Override
@@ -505,7 +508,7 @@ public class MainActivity extends SherlockFragmentActivity {
                 break;
             // Restore last playlist
             case R.id.ml_menu_last_playlist:
-                Intent i = new Intent(AudioService.ACTION_REMOTE_LAST_PLAYLIST);
+                Intent i = new Intent(MediaService.ACTION_REMOTE_LAST_PLAYLIST);
                 sendBroadcast(i);
                 break;
             // Open MRL
@@ -641,7 +644,7 @@ public class MainActivity extends SherlockFragmentActivity {
                 {
                     @Override
                     public void run() {
-                      AudioServiceController c = AudioServiceController.getInstance();
+                      MediaServiceController c = MediaServiceController.getInstance();
                       String s = input.getText().toString();
 
                       /* Use the audio player by default. If a video track is

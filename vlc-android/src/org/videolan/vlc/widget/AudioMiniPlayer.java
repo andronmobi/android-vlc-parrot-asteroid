@@ -24,6 +24,7 @@ import org.videolan.vlc.R;
 import org.videolan.vlc.gui.audio.AudioPlayerActivity;
 import org.videolan.vlc.interfaces.IAudioPlayer;
 import org.videolan.vlc.interfaces.IAudioPlayerControl;
+import org.videolan.vlc.interfaces.IMediaPlayerControl;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -46,7 +47,7 @@ import android.widget.TextView;
 public class AudioMiniPlayer extends Fragment implements IAudioPlayer {
     public static final String TAG = "VLC/AudioMiniPlayer";
 
-    private IAudioPlayerControl mAudioPlayerControl;
+    private IMediaPlayerControl mAudioPlayerControl;
     private String lastTitle;
 
     private TextView mTitle;
@@ -143,7 +144,7 @@ public class AudioMiniPlayer extends Fragment implements IAudioPlayer {
         return super.onContextItemSelected(item);
     }
 
-    public void setAudioPlayerControl(IAudioPlayerControl control) {
+    public void setAudioPlayerControl(IMediaPlayerControl control) {
         mAudioPlayerControl = control;
     }
 

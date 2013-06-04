@@ -23,12 +23,12 @@ package org.videolan.vlc.gui;
 import java.io.IOException;
 
 import org.videolan.libvlc.LibVLC;
-import org.videolan.vlc.AudioServiceController;
+import org.videolan.vlc.MediaServiceController;
 import org.videolan.vlc.R;
 import org.videolan.vlc.Util;
 import org.videolan.vlc.VlcRunnable;
 import org.videolan.vlc.gui.audio.AudioPlayerActivity;
-import org.videolan.vlc.gui.video.VideoPlayerActivity;
+import org.videolan.vlc.gui.media.MediaPlayerActivity;
 import org.videolan.vlc.interfaces.ISortable;
 
 import android.app.AlertDialog;
@@ -129,7 +129,7 @@ public class DirectoryViewFragment extends SherlockListFragment implements ISort
             openMediaFile(info.position);
             return true;
         } else if(id == R.id.directory_view_append) {
-            AudioServiceController.getInstance().append(mediaLocation);
+            MediaServiceController.getInstance().append(mediaLocation);
             return true;
         } else if(id == R.id.directory_view_delete) {
             AlertDialog alertDialog = CommonDialogs.deleteMedia(getActivity(), mediaLocation,
@@ -141,10 +141,10 @@ public class DirectoryViewFragment extends SherlockListFragment implements ISort
                     });
             alertDialog.show();
         } else if(id == R.id.directory_view_play_audio) {
-            AudioServiceController.getInstance().load(mediaLocation, 0, false, true);
+            MediaServiceController.getInstance().load(mediaLocation, 0, false, true);
             AudioPlayerActivity.start(getActivity());
         } else if(id == R.id.directory_view_play_video) {
-            VideoPlayerActivity.start(getActivity(), mediaLocation);
+            MediaPlayerActivity.start(getActivity(), mediaLocation);
         }
         return super.onContextItemSelected(item);
     }
@@ -166,7 +166,7 @@ public class DirectoryViewFragment extends SherlockListFragment implements ISort
     };
 
     private void openMediaFile(int p) {
-        AudioServiceController audioController = AudioServiceController.getInstance();
+        MediaServiceController audioController = MediaServiceController.getInstance();
         String mediaFile = mDirectoryAdapter.getMediaLocation(p);
 
         try {
@@ -175,7 +175,7 @@ public class DirectoryViewFragment extends SherlockListFragment implements ISort
                 audioController.load(mDirectoryAdapter.getAllMediaLocations(), p-1); /* p-1 to exclude ".," */
                 AudioPlayerActivity.start(getActivity());
             } else {
-                VideoPlayerActivity.start(getActivity(), mediaFile);
+                MediaPlayerActivity.start(getActivity(), mediaFile);
             }
         } catch (IOException e) {
             /* disk error maybe? */
