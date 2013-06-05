@@ -26,6 +26,7 @@
 
     <ImageButton
         android:id="@+id/player_overlay_screen"
+        android:visibility="gone"
         android:layout_width="40dip"
         android:layout_height="40dip"
         android:background="@drawable/ic_screen_normal" />

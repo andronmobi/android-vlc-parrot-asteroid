@@ -20,7 +20,9 @@
 
 package org.videolan.vlc.gui.media;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -106,16 +108,10 @@ public class MediaPlayerActivity extends Activity implements IMediaPlayer {
     private SurfaceHolder mSurfaceHolder;
     private FrameLayout mSurfaceFrame;
     private int mSurfaceAlign;
-    //private LibVLC mLibVLC;
     private MediaServiceController mMediaController;
     private String mLocation;
 
     private Method mSetTitleMethod;
-    private Notification mNotification;
-    private NotificationManager mNotificationManager;
-
-    private static final int NOTIFY_EXTERNAL_DISPLAY = 1;
-    private static final int NOTIFICATION_FLAG_CUSTOM_EVENT = 0x100; // For GingerBread
 
     private static final int SURFACE_BEST_FIT = 0;
     private static final int SURFACE_FIT_HORIZONTAL = 1;
@@ -163,10 +159,7 @@ public class MediaPlayerActivity extends Activity implements IMediaPlayer {
     private int mScreenId = 0;
 
     private boolean mIsConnected = false;
-    
-//    private static int PLAYER_STATUS_IDLE = 0;
-//    private static int PLAYER_STATUS_PAUSED = 1;
-    
+
     /**
      * For uninterrupted switching between audio and video mode
      */
@@ -197,6 +190,8 @@ public class MediaPlayerActivity extends Activity implements IMediaPlayer {
     // Tracks & Subtitles
     private Map<Integer,String> mAudioTracksList;
     private Map<Integer,String> mSubtitleTracksList;
+
+    private ImageButton mScreen;
 
     @Override
     @TargetApi(11)
@@ -330,12 +325,6 @@ public class MediaPlayerActivity extends Activity implements IMediaPlayer {
         registerReceiver(mReceiver, filter);
 
         mMediaController = MediaServiceController.getInstance();
-//        try {
-//            mLibVLC = Util.getLibVlcInstance();
-//        } catch (LibVlcException e) {
-//            Log.d(TAG, "LibVLC initialisation failed");
-//            return;
-//        }
 
         EventHandler em = EventHandler.getInstance();
         em.addHandler(eventHandler);
@@ -347,17 +336,18 @@ public class MediaPlayerActivity extends Activity implements IMediaPlayer {
                 ? mScreenOrientation
                 : getScreenOrientation());
 
-        Intent intent = new Intent(this, MediaPlayerActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        int icon = R.drawable.video_notif_external_display_play;
-        long when = System.currentTimeMillis();
-        mNotification = new Notification(icon, "", when);
-        mNotification.flags |= NOTIFICATION_FLAG_CUSTOM_EVENT | Notification.FLAG_NO_CLEAR;
-        RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notif_background);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mNotification.contentIntent = pendingIntent;
-        mNotification.contentView = contentView;
+        mScreen = (ImageButton) findViewById(R.id.player_overlay_screen);
+        try {
+            Process ifc = Runtime.getRuntime().exec("getprop ro.parrot.media.out");
+            BufferedReader bis = new BufferedReader(new InputStreamReader(ifc.getInputStream()));
+            String property = bis.readLine();
+            if ("true".equals(property)) {
+                mScreen.setVisibility(View.VISIBLE);
+            }
+            ifc.destroy();
+        } catch (java.io.IOException e) {
+            Log.e(TAG, "Can't execute getprop, media output wont be available." + e.toString());
+        }
     }
 
     @Override
@@ -442,7 +432,6 @@ public class MediaPlayerActivity extends Activity implements IMediaPlayer {
         em.removeHandler(eventHandler);
 
         mAudioManager = null;
-        mNotificationManager.cancelAll();
     }
 
     private void doLoading() {
