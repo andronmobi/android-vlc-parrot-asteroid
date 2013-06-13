@@ -281,22 +281,37 @@ public class MediaService extends Service {
         if(!Util.isFroyoOrLater()) // NOP if not supported
             return;
 
-        audioFocusListener = new OnAudioFocusChangeListener() {
-            @Override
-            public void onAudioFocusChange(int focusChange) {
-                if(focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK ||
-                   focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-                    /*
-                     * Lower the volume to 36% to "duck" when an alert or something
-                     * needs to be played.
-                     */
-                    LibVLC.getExistingInstance().setVolume(36);
-                } else {
-                    LibVLC.getExistingInstance().setVolume(100);
-                }
-            }
-        };
+        if (audioFocusListener == null) {
+            audioFocusListener = new OnAudioFocusChangeListener() {
 
+                @Override
+                public void onAudioFocusChange(int focusChange) {
+                    switch( focusChange ) {
+                    case AudioManager.AUDIOFOCUS_LOSS:
+                        if( LibVLC.getExistingInstance().isPlaying() ) {
+                            stop();
+                        }
+                        break;
+                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                        if( LibVLC.getExistingInstance().isPlaying() ) {
+                            pause();
+                        }
+                        break;
+                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                        LibVLC.getExistingInstance().setVolume(36);
+                        break;
+                    case AudioManager.AUDIOFOCUS_GAIN :
+                    case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT:
+                        LibVLC.getExistingInstance().setVolume(100);
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            };
+        }
+
+        Log.i(TAG, "changeAudioFocus gain=" + gain);
         AudioManager am = (AudioManager)getSystemService(AUDIO_SERVICE);
         if(gain)
             am.requestAudioFocus(audioFocusListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
